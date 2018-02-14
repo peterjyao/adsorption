@@ -59,15 +59,18 @@ def rates(state, t, paras):
     dqdt = k1 * c * (qmax - q) - k2 * q
     return [dcdt, dqdt]
 
+
 def conc(t, initial_state, paras):
     x = odeint(rates, initial_state, t, args=(paras,))
     return x
+
 
 def residual_sq(paras, t, initial_state, data):
     model = conc(t, initial_state, paras)
     c_model = model[:, 0]
     e = ((c_model - data) ** 2).sum()
     return e
+
 
 def rates_part2(state, t, paras):
     c1, q1, c2, q2 = state
@@ -84,24 +87,27 @@ def rates_part2(state, t, paras):
 
     return [dc1dt, dq1dt, dc2dt, dq2dt]
 
+
 def conc_part2(t, initial_state, paras):
     x = odeint(rates_part2, initial_state, t, args=(paras,))
     return x
 
-V = 50
-Vdot = linregress(time, volume).slope
-c_input = 4.94
-c_init = concentration[0]
 
-init_state = c_init, 30
+V = 670 # mL
+Vdot = linregress(time, volume).slope # mL/s
+c_input = 4.94 # mg/mL
+c_init = concentration[0]
+q_init = c_input - c_init
+
+init_state = c_init, q_init
 
 p_guess = [0.01, 0.01, 20]
 
 k1fit, k2fit, qmaxfit = fmin(residual_sq, p_guess, args=(time, init_state, concentration))
 
-init_state_part2 = c_init, 30, c_init, 0
+init_state_part2 = c_init, q_init, c_init, 0
 
-t_sim = np.arange(0, 3000, 1)
+t_sim = np.arange(0, 6000, 1)
 v_sim = t_sim * Vdot
 
 part2 = conc_part2(t_sim, init_state_part2, [k1fit, k2fit, qmaxfit])

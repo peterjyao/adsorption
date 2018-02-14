@@ -86,20 +86,21 @@ def conc_part2(t, initial_state, paras):
     x = odeint(rates_part2, initial_state, t, args=(paras,))
     return x
 
-V = 50
+V = 670
 Vdot = linregress(time, volume).slope
 c_input = 4.94
 c_init = concentration[0]
+q_init = c_input - c_init
 
-init_state = c_init, 30
+init_state = c_init, q_init
 
 p_guess = [0.01, 20]
 
 k1fit, qmaxfit = fmin(residual_sq, p_guess, args=(time, init_state, concentration))
 
-init_state_part2 = c_init, 30, c_init, 30
+init_state_part2 = c_init, q_init, c_init, 0
 
-t_sim = np.arange(0, 3000, 1)
+t_sim = np.arange(0, 6000, 1)
 v_sim = t_sim * Vdot
 
 part2 = conc_part2(t_sim, init_state_part2, [k1fit, qmaxfit])
