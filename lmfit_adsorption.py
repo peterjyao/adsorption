@@ -63,9 +63,11 @@ def conc(t, c0, q0, k1, k2, qmax):
     x = odeint(rates, initial_state, t, args=(params_list, ))
     return x
 
+
 def c_conc(t, c0, q0, k1, k2, qmax):
     x = conc(t, c0, q0, k1, k2, qmax)
     return x[:,0]
+
 
 V = 670 # mL
 Vdot = linregress(time, volume).slope # mL/s
