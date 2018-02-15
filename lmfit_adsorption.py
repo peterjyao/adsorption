@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from scipy.stats import linregress
 from scipy.optimize import fmin
+from scipy.optimize import leastsq
 import lmfit
 from matplotlib2tikz import save as tikz_save
 
@@ -60,14 +61,25 @@ def conc_index(t, c0, q0, k1, k2, qmax, index, v=Vol):
     return x[:, index]
 
 
-def residual_sq(paras, t, c0, q0, V, data):
+def residual_sq(paras, t, c0, q0, v, data):
     k1 = paras[0]
     k2 = paras[1]
     qmax = paras[2]
 
-    model = conc(t, c0, q0, k1, k2, qmax, V)
+    model = conc(t, c0, q0, k1, k2, qmax, v)
     model_c = model[:, 0]
     e = ((model_c - data) ** 2).sum()
+    return e
+
+
+def residual(paras, t, c0, q0, v, data):
+    k1 = paras[0]
+    k2 = paras[1]
+    qmax = paras[2]
+
+    model = conc(t, c0, q0, k1, k2, qmax, v)
+    model_c = model[:, 0]
+    e = model_c - data
     return e
 
 
@@ -137,6 +149,7 @@ k2_bound = bound_results.params['k2'].value
 qmax_bound = bound_results.params['qmax'].value
 
 k1_fmin, k2_fmin, qmax_fmin = fmin(residual_sq, [0.01, 0.01, 1], args=(time, c_init, q_init, Vol, concentration))
+k1_leastsq, k2_leastsq, qmax_leastsq = leastsq(residual, [0.01, 0.01, 1], args=(time, c_init, q_init, Vol, concentration))[0]
 
 print([k1_lmfit, k2_lmfit, qmax_lmfit], '\n', [k1_bound, k2_bound, qmax_bound], '\n', [k1_fmin, k2_fmin, qmax_fmin])
 
