@@ -64,28 +64,28 @@ def conc(t, c0, q0, k1, k2, qmax):
     return x
 
 
-def c_conc(t, c0, q0, k1, k2, qmax):
+def c_conc(t, c0, q0, k1, k2, qmax, index):
     x = conc(t, c0, q0, k1, k2, qmax)
-    return x[:,0]
+    return x[:,index]
 
 
-V = 670 # mL
+V = 50 #670 # mL
 Vdot = linregress(time, volume).slope # mL/s
 c_input = 4.94 # mg/mL
 c_init = concentration[0]
-q_init = c_input - c_init
+q_init = 30 #c_input - c_init
 
-c_model = lmfit.Model(c_conc)
+c_model = lmfit.Model(c_conc, independent_vars=['t','index'])
 
 params = c_model.make_params()
 
-params['k1'].value = 1.6e-5
+params['k1'].value = 0.01
 params['k1'].min = 0
 
-params['k2'].value = 0.003
+params['k2'].value = 0.01
 params['k2'].min = 0
 
-params['qmax'].value = 9.48
+params['qmax'].value = 1
 params['qmax'].min = 0
 
 params['c0'].value = c_init
@@ -94,4 +94,6 @@ params['c0'].vary = False
 params['q0'].value = q_init
 params['q0'].vary = False
 
-fit_results = c_model.fit(concentration,params,t=time)
+fit_results = c_model.fit(concentration,params,t=time, index=0)
+print(fit_results.fit_report())
+fit_results.plot()

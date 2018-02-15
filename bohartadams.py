@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from scipy.optimize import fmin
 from scipy.stats import linregress
-from matplotlib2tikz import save as tikz_save
+#from matplotlib2tikz import save as tikz_save
 
 plt.style.use('bmh')
 
@@ -111,7 +111,7 @@ plt.plot(time, conc(time, init_state, [k1fit, qmaxfit])[:, 0], color='k', linest
 plt.xlabel('Time (s)')
 plt.ylabel('Concentration (mg/mL)')
 plt.legend(loc='lower right')
-tikz_save('bohartadams_fit.tikz', figureheight='8cm', figurewidth='12cm')
+#tikz_save('bohartadams_fit.tikz', figureheight='8cm', figurewidth='12cm')
 
 plt.gcf().clear()
 plt.plot(v_sim, part2[:, 0], color='#467821', label='Filter 1')
@@ -119,4 +119,4 @@ plt.plot(v_sim, part2[:, 2], color='#D55E00', label='Filter 2')
 plt.xlabel('Volume (mL)')
 plt.ylabel('Concentration (mg/mL)')
 plt.legend(loc='lower right')
-tikz_save('bohartadams_simulation.tikz', figureheight='8cm', figurewidth='12cm')
+#tikz_save('bohartadams_simulation.tikz', figureheight='8cm', figurewidth='12cm')
