@@ -150,10 +150,10 @@ qmax_bound = bound_results.params['qmax'].value
 k1_fmin, k2_fmin, qmax_fmin = fmin(residual_sq, [0.01, 0.01, 1], args=(time, c_init, q_init, Vol, concentration))
 k1_leastsq, k2_leastsq, qmax_leastsq = leastsq(residual, np.array([0.01, 0.01, 1]),
                                                args=(time, c_init, q_init, Vol, concentration))[0]
-k1_least_squares, k2_least_squares, qmax_least_squares  = least_squares(residual, [0.01, 0.01, 1],
-                                                                        bounds=([0,np.inf]),
-                                                                        args=(time, c_init, q_init, Vol,
-                                                                              concentration)).x
+k1_least_squares, k2_least_squares, qmax_least_squares = least_squares(residual, [0.01, 0.01, 1],
+                                                                       bounds=([0, np.inf]),
+                                                                       args=(time, c_init, q_init, Vol,
+                                                                             concentration)).x
 
 print([k1_lmfit, k2_lmfit, qmax_lmfit], '\n', [k1_bound, k2_bound, qmax_bound], '\n', [k1_fmin, k2_fmin, qmax_fmin])
 
