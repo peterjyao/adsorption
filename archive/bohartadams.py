@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from scipy.optimize import fmin
 from scipy.stats import linregress
-from matplotlib2tikz import save as tikz_save
+#from matplotlib2tikz import save as tikz_save
 
 plt.style.use('bmh')
 
@@ -52,18 +52,15 @@ def rates(state, t, paras):
     c, q = state
 
     k1 = paras[0]
-    k2 = paras[1]
-    qmax = paras[2]
+    qmax = paras[1]
 
-    dcdt = Vdot / V * (c_input - c) - k1 * c * (qmax - q) + k2 * q
-    dqdt = k1 * c * (qmax - q) - k2 * q
+    dcdt = Vdot / V * (c_input - c) - k1 * c * (qmax - q)
+    dqdt = k1 * c * (qmax - q)
     return [dcdt, dqdt]
-
 
 def conc(t, initial_state, paras):
     x = odeint(rates, initial_state, t, args=(paras,))
     return x
-
 
 def residual_sq(paras, t, initial_state, data):
     model = conc(t, initial_state, paras)
@@ -71,54 +68,50 @@ def residual_sq(paras, t, initial_state, data):
     e = ((c_model - data) ** 2).sum()
     return e
 
-
 def rates_part2(state, t, paras):
     c1, q1, c2, q2 = state
 
     k1 = paras[0]
-    k2 = paras[1]
-    qmax = paras[2]
+    qmax = paras[1]
 
-    dc1dt = Vdot / V * (c_input - c1) - k1 * c1 * (qmax - q1) + k2 * q1
-    dq1dt = k1 * c1 * (qmax - q1) - k2 * q1
+    dc1dt = Vdot / V * (c_input - c1) - k1 * c1 * (qmax - q1)
+    dq1dt = k1 * c1 * (qmax - q1)
 
-    dc2dt = Vdot / V * (c1 - c2) - k1 * c2 * (qmax - q2) + k2 * q2
-    dq2dt = k1 * c2 * (qmax - q2) - k2 * q2
+    dc2dt = Vdot / V * (c1 - c2) - k1 * c2 * (qmax - q2)
+    dq2dt = k1 * c2 * (qmax - q2)
 
     return [dc1dt, dq1dt, dc2dt, dq2dt]
-
 
 def conc_part2(t, initial_state, paras):
     x = odeint(rates_part2, initial_state, t, args=(paras,))
     return x
 
-
-V = 670 # mL
-Vdot = linregress(time, volume).slope # mL/s
-c_input = 4.94 # mg/mL
+V = 670
+Vdot = linregress(time, volume).slope
+c_input = 4.94
 c_init = concentration[0]
 q_init = c_input - c_init
 
 init_state = c_init, q_init
 
-p_guess = [0.01, 0.01, 20]
+p_guess = [0.01, 20]
 
-k1fit, k2fit, qmaxfit = fmin(residual_sq, p_guess, args=(time, init_state, concentration))
+k1fit, qmaxfit = fmin(residual_sq, p_guess, args=(time, init_state, concentration))
 
 init_state_part2 = c_init, q_init, c_init, 0
 
 t_sim = np.arange(0, 6000, 1)
 v_sim = t_sim * Vdot
 
-part2 = conc_part2(t_sim, init_state_part2, [k1fit, k2fit, qmaxfit])
+part2 = conc_part2(t_sim, init_state_part2, [k1fit, qmaxfit])
 
 plt.gcf().clear()
 plt.plot(time, concentration, marker='o', linestyle='None', color='k',markerfacecolor='None', label='Experiment')
-plt.plot(time, conc(time, init_state, [k1fit, k2fit, qmaxfit])[:, 0], color='k', linestyle='dashed', label='Fit')
+plt.plot(time, conc(time, init_state, [k1fit, qmaxfit])[:, 0], color='k', linestyle='dashed', label='Fit')
 plt.xlabel('Time (s)')
 plt.ylabel('Concentration (mg/mL)')
 plt.legend(loc='lower right')
-tikz_save('thomas_fit.tikz', figureheight='8cm', figurewidth='12cm')
+#tikz_save('bohartadams_fit.tikz', figureheight='8cm', figurewidth='12cm')
 
 plt.gcf().clear()
 plt.plot(v_sim, part2[:, 0], color='#467821', label='Filter 1')
@@ -126,4 +119,4 @@ plt.plot(v_sim, part2[:, 2], color='#D55E00', label='Filter 2')
 plt.xlabel('Volume (mL)')
 plt.ylabel('Concentration (mg/mL)')
 plt.legend(loc='lower right')
-tikz_save('thomas_simulation.tikz', figureheight='8cm', figurewidth='12cm')
+#tikz_save('bohartadams_simulation.tikz', figureheight='8cm', figurewidth='12cm')
